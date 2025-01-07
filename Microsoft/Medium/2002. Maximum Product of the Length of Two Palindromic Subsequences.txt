@@ -1,0 +1,52 @@
+class Solution {
+public:
+    bool isPal(string& subsequence) {
+        int i = 0;
+        int j = subsequence.size() - 1;
+
+        while(i < j) {
+            if(subsequence[i++] != subsequence[j--]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    int maxProduct(string& s) {
+        // bit masking
+        int n = s.size();
+        int totalMasking = 1 << n;
+
+        vector<int> masking(totalMasking, 0);
+
+        // O(2^n) == 2^12 == 1e3 i.e O(n)
+        for(int mask=0; mask<totalMasking; mask++) { 
+            string subsequence = "";
+            for(int i=0; i<n; i++) {
+                if(mask & (1 << i)) {
+                    subsequence += s[i];
+                }
+            }
+            // cout << subsequence << endl;
+            if(!subsequence.empty() && isPal(subsequence)) {
+                // cout << subsequence << endl;
+                masking[mask] = subsequence.size();
+            }
+        }
+
+        int maxi = INT_MIN;
+        // O(totalMask^2) == 1e3 * 1e3 == 1e6 i.e O(n)
+        for(int mask1=0; mask1<totalMasking; mask1++) {
+            for(int mask2=mask1+1; mask2<totalMasking; mask2++) {
+                // make sure it is disjoint
+                // if mask1 & mask2 == 0 then i.e they don't overlap(disjoint)
+                if((mask1 & mask2) == 0) {
+                    int product = masking[mask1] * masking[mask2];
+                    maxi = max(maxi, product);
+                }
+            }
+        }
+        return maxi;
+    }
+};
